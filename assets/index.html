@@ -1,0 +1,29 @@
+<html>
+    <head>
+        <title>My Local HTML File</title>
+    </head>
+
+    <body>
+        <h1 id="title">Hello World!</h1>
+        <button onclick="test()"></button>
+        <script type="text/javascript">
+          window.addEventListener("paymentEvent", (event) => {
+            console.log(event.detail);
+          });
+
+          function test() {
+            window.dispatchEvent(new CustomEvent('paymentEvent', {detail: 'some message here'}));
+          }
+
+            function fromFlutter(newTitle) {
+                document.getElementById("title").innerHTML = newTitle;
+                sendBack();
+             }
+
+             function sendBack() {
+              messageHandler.postMessage("Hello from JS");
+              messageHandler2.postMessage("Hello from JS 2");
+             }
+        </script>
+    </body>
+</html>
