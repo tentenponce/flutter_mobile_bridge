@@ -1,8 +1,8 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_webjs_communication/payment_param.dart';
-import 'package:flutter_webjs_communication/payment_result.dart';
+import 'package:flutter_mobile_bridge/flutter_mobile_bridge.dart';
+import 'package:flutter_mobile_bridge/models/payment_result.dart';
 import 'package:uuid/uuid.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
@@ -60,21 +60,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   initialUrl: 'https://flutter-jsbridge.web.app/#/',
                   javascriptMode: JavascriptMode.unrestricted,
                   javascriptChannels: {
-                    JavascriptChannel(
-                        name: 'channelPay',
-                        onMessageReceived: (JavascriptMessage message) {
-                          PaymentParam paymentParam = PaymentParam.fromJson(
-                              json.decode(message.message));
-
-                          setState(() {
-                            _amount = paymentParam.amount;
-                          });
-                        }),
+                    FlutterMobileBridge.handleChannelPay(
+                      onPaymentEvent: (param) {
+                        setState(() {
+                          _amount = param.amount;
+                        });
+                      },
+                    )
                   },
                   onWebViewCreated: (WebViewController webviewController) {
                     _controller = webviewController;
-                    _controller!.runJavascript(
-                        'window.dispatchEvent(new CustomEvent("eventUser", {detail: "Juan Dela Cruz"}))');
+                  },
+                  onPageFinished: (url) {
+                    FlutterMobileBridge.dispatchUser(
+                        _controller!, 'Juan Dela Cruz');
                   },
                 ),
               ),
@@ -88,8 +87,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 onPressed: () {
                   PaymentResult paymentResult =
                       PaymentResult(transactionId: const Uuid().v4(), fee: 20);
-                  _controller!.runJavascript(
-                      "window.dispatchEvent(new CustomEvent('eventPayment', {detail: '${json.encode(paymentResult)}'}))");
+                  FlutterMobileBridge.dispatchSuccessPayment(
+                    _controller!,
+                    paymentResult,
+                  );
                 },
                 child: const Text('Trigger payment success'))
           ],
