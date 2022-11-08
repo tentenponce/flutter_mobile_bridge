@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         });
                       },
                     )
-                  },
+                  }.toSet(),
                   onWebViewCreated: (WebViewController webviewController) {
                     _controller = webviewController;
                   },
